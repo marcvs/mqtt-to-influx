@@ -11,6 +11,7 @@ import os
 import sys
 import datetime
 import configargparse
+import json
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
 
@@ -58,47 +59,90 @@ def on_connect(mqtt_client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(mqtt_client, userdata, msg):
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    device_name = msg.topic.split("/status/")[0].lstrip("/").replace("/",".")
-    device_key  = msg.topic.split("/status/")[1]
-    topic_dotted = msg.topic.replace("/",".").lstrip(".")
-    topic_unders = msg.topic.replace("/","_").lstrip("_")
-    payload_dec  = msg.payload.decode()
-    # print ('Message: %s - %s - %s' % (current_time, topic_dotted, payload_dec))
-    print ('dev_name: %s - key: %s - value: %s' % (device_name, device_key, payload_dec))
-    json_body = [
-        {
-            "measurement": str(device_name),
-            "tags": {
-                "friendly_name": str(device_key)
-                # "friendly_name": str(device_name),
-                # str(device_key): str(payload_dec)
-                # str(device_key): "x"
-            },
-            "fields": {
-                "value": float(payload_dec)
+    # print (msg.topic.split("/"))
+    if (msg.topic.split("/")[1] in ('sensor', 'luefter')):
+        device_name = msg.topic.split("/status/")[0].lstrip("/").replace("/",".")
+        device_key  = msg.topic.split("/status/")[1]
+        topic_dotted = msg.topic.replace("/",".").lstrip(".")
+        topic_unders = msg.topic.replace("/","_").lstrip("_")
+        payload_dec  = msg.payload.decode()
+        # print ('Message: %s - %s - %s' % (current_time, topic_dotted, payload_dec))
+        print ('dev_name: %s - key: %s - value: %s' % (device_name, device_key, payload_dec))
+        json_body = [
+            {
+                "measurement": str(device_name),
+                "tags": {
+                    "friendly_name": str(device_key)
+                    # "friendly_name": str(device_name),
+                    # str(device_key): str(payload_dec)
+                    # str(device_key): "x"
+                },
+                "fields": {
+                    "value": float(payload_dec)
+                }
             }
-        }
-    ]
-# drop database home_db
-# create database home_db
-# grant all on home_db to writer
-# grant read on home_db to grafana
-    
-    # json_body = [
-    # {
-    #     "measurement": str(device_name+'_'+device_key),
-    #     # "tags": {
-    #     #     "host": "q",
-    #     #     "friendly_name": str(device_name)
-    #     # },
-    #   #  "time": str(current_time),
-    #     "fields": {
-    #         "value": float(payload_dec)
-    #     }
-    # }
-    # ]
-    influx_client.write_points(json_body)
-    # print(msg.topic+" "+str(msg.payload))
+        ]
+        influx_client.write_points(json_body)
+    elif ((msg.topic.split("/")[1] in ('homegear')) and (msg.topic.split("/")[3] in ('jsonobj'))):
+          # 1 "Entkleide"
+          # 2 "Wohnzimmer"
+          # 3 "Kueche vorn"
+          # 4 "Kueche hinten"
+          # 5 "Gaestezimmer"
+          # 6 "Bad"
+        devices=[" ", "Entkleide" , "Wohnzimmer" , "Kueche vorn" , "Kueche hinten" , "Gaestezimmer" , "Bad"]
+        device_num   = msg.topic.split("/")[4]
+        device_name  = devices[int(device_num)]
+        # print ('Message: %s - %s - %s' % (current_time, topic_dotted, payload_dec))
+        print ('dev_num: %s: %s ' % (device_num, device_name))
+        payload_json = json.loads(msg.payload.decode())
+        for (k,v) in payload_json.items():
+            print ("key: %s - value: %s" % (k,v))
+            payload_json[k]=float(v)
+            print ("key: %s - value: %s" % (k,v))
+        try:
+            json_body = [
+                    {
+                    "measurement": str(device_name),
+                    "tags": payload_json ,
+                    "fields": {
+                        "value": 0.0
+                    }
+                }
+            ]
+            # print(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
+            # print(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
+
+            influx_client.write_points(json_body)
+        except Exception as e:
+            print (str(e))
+        
+    # > CREATE DATABASE openhab_db
+    # > CREATE USER admin WITH PASSWORD 'SuperSecretPassword123+' WITH ALL PRIVILEGES
+    # > CREATE USER openhab WITH PASSWORD 'AnotherSuperbPassword456-'
+    # > CREATE USER grafana WITH PASSWORD 'PleaseLetMeRead789?'
+    # > GRANT ALL ON openhab_db TO openhab
+    # > GRANT READ ON openhab_db TO grafana
+    # drop database home_db
+    # create database home_db
+    # grant all on home_db to writer
+    # grant read on home_db to grafana
+        
+        # json_body = [
+        # {
+        #     "measurement": str(device_name+'_'+device_key),
+        #     # "tags": {
+        #     #     "host": "q",
+        #     #     "friendly_name": str(device_name)
+        #     # },
+        #   #  "time": str(current_time),
+        #     "fields": {
+        #         "value": float(payload_dec)
+        #     }
+        # }
+        # ]
+        # influx_client.write_points(json_body)
+        # print(msg.topic+" "+str(msg.payload))
 
 
 
