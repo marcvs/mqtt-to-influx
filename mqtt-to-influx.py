@@ -47,7 +47,6 @@ def parseOptions():
 
     return parser
 
-
 # The callback for when the mqtt_client receives a CONNACK response from the server.
 def on_connect(mqtt_client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -66,8 +65,7 @@ def on_message(mqtt_client, userdata, msg):
         topic_dotted = msg.topic.replace("/",".").lstrip(".")
         topic_unders = msg.topic.replace("/","_").lstrip("_")
         payload_dec  = msg.payload.decode()
-        # print ('Message: %s - %s - %s' % (current_time, topic_dotted, payload_dec))
-        print ('dev_name: %s - key: %s - value: %s' % (device_name, device_key, payload_dec))
+        # print ('dev_name: %s - key: %s - value: %s' % (device_name, device_key, payload_dec))
         json_body = [
             {
                 "measurement": str(device_name),
@@ -94,20 +92,20 @@ def on_message(mqtt_client, userdata, msg):
         device_num   = msg.topic.split("/")[4]
         device_name  = devices[int(device_num)]
         # print ('Message: %s - %s - %s' % (current_time, topic_dotted, payload_dec))
-        print ('dev_num: %s: %s ' % (device_num, device_name))
+        # print ('dev_num: %s: %s ' % (device_num, device_name))
         payload_json = json.loads(msg.payload.decode())
+
+        # print(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
         for (k,v) in payload_json.items():
-            print ("key: %s - value: %s" % (k,v))
+            # print ("key: %s - value: %s" % (k,v))
             payload_json[k]=float(v)
-            print ("key: %s - value: %s" % (k,v))
+            # print ("key: %s - value: %s" % (k,payload_json[k]))
+        # print(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
         try:
             json_body = [
                     {
                     "measurement": str(device_name),
-                    "tags": payload_json ,
-                    "fields": {
-                        "value": 0.0
-                    }
+                    "fields": payload_json 
                 }
             ]
             # print(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
@@ -128,23 +126,6 @@ def on_message(mqtt_client, userdata, msg):
     # grant all on home_db to writer
     # grant read on home_db to grafana
         
-        # json_body = [
-        # {
-        #     "measurement": str(device_name+'_'+device_key),
-        #     # "tags": {
-        #     #     "host": "q",
-        #     #     "friendly_name": str(device_name)
-        #     # },
-        #   #  "time": str(current_time),
-        #     "fields": {
-        #         "value": float(payload_dec)
-        #     }
-        # }
-        # ]
-        # influx_client.write_points(json_body)
-        # print(msg.topic+" "+str(msg.payload))
-
-
 
 args = parseOptions().parse_args()
 
