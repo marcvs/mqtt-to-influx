@@ -1,0 +1,32 @@
+[mqtt_topics]
+/sensor/1/status/#: mh_sensor_v1
+/sensor/2/status/#: mh_sensor_v1
+/luefter/1/status/#: mh_sensor_v1
+/luefter/2/status/#: mh_sensor_v1
+
+/homegear/homegear/jsonobj/#: homegear
+
+#/sensor/4/#: tasmota_sensor_am2301
+/sensor/4/SENSOR: tasmota_sensor_am2301
+/sensor/4/STATE: tasmota_sensor_am2301_state
+
+
+[mh_sensor_v1]
+debug: false
+do_write_to_influx: false
+verbose: 0
+
+[homegear]
+debug: false 
+do_write_to_influx: false
+verbose: 0
+
+[tasmota_sensor_am2301]
+debug: false
+do_write_to_influx: true
+verbose: 1
+
+[tasmota_sensor_am2301_state]
+debug: false
+do_write_to_influx: true
+verbose: 1
