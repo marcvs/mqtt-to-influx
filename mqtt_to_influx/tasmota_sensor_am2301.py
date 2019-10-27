@@ -50,6 +50,13 @@ class Process_mqtt_message:
         except KeyError as e:
             print (F"Key error in {__name__}: {e}\n{msg.topic} - {msg.payload}")
             return None
+        except Exception as e:
+            print (F"uncaught exception: processing {msg.topic} - {msg.payload}\n    {e}")
+            #FIXME: Power cycle the sensor!
+            # marcus@nemo:~$ echo "OFF" | mosquitto_pub -q 1 -h q -l -t /sensor/4/cmnd/POWER1
+            # marcus@nemo:~$ echo "ON" | mosquitto_pub -q 1 -h q -l -t /sensor/4/cmnd/POWER2
+            return None
+
         # print (F"abs_hum: {abs_hum}")
         payload_json["AM2301"]["Absolute_Humidity"] = abs_hum
         try:
