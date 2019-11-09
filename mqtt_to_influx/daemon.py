@@ -38,16 +38,18 @@ def on_connect(mqtt_client, userdata, flags, rc):
             callback_func = getattr(sys.modules["mqtt_to_influx." + CONFIG['mqtt_topics'][path]], "Process_mqtt_message")
             mqtt_client.message_callback_add(path, callback_func)
             is_verbose = "silent"
-            if int(CONFIG[CONFIG['mqtt_topics'][path]]['verbose']) == 1:
-                is_verb = "verbose"
+            config_verbose = int(CONFIG[CONFIG['mqtt_topics'][path]]['verbose'])
+            # logger.info("verbose: {}".format(config_verbose))
+            if  config_verbose == 1:
+                is_verbose = "verbose"
 
             is_active = "not active"
-            xxxxxxx = CONFIG[CONFIG['mqtt_topics'][path]].get( 'do_write_to_influx' , False)
-            logger.info(F"xxx: {xxxxxxx}")
-            if xxxxxxx :
+            config_influx_active = CONFIG[CONFIG['mqtt_topics'][path]].getboolean( 'do_write_to_influx')
+            # logger.info("active: {}".format(config_influx_active))
+            if config_influx_active is True:
                 is_active = "activated"
-            logger.info("Connected {:.<31} {:.<30} {:.<8} {}".format(path+' ', CONFIG['mqtt_topics'][path]+' ',\
-                    is_verbose, is_active))
+            logger.info("Connected {:.<31} {:.<30} {:.<10} {}".format(path+' ', CONFIG['mqtt_topics'][path]+' ',\
+                    is_verbose+' ', is_active))
         except Exception as e:
             logger.exception("  Error connecting to mqtt")
             exit (2)
