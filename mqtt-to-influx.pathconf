@@ -10,6 +10,7 @@
 /sensor/4/SENSOR: tasmota_sensor_am2301
 /sensor/4/STATE: tasmota_sensor_am2301_state
 
+/sensor/arno/SENSOR: tasmota_sensor_ds18b20
 
 [mh_sensor_v1]
 debug: false
@@ -23,10 +24,15 @@ verbose: 0
 
 [tasmota_sensor_am2301]
 debug: false
-do_write_to_influx: true
-verbose: 1
+do_write_to_influx: false
+verbose: 0
 
 [tasmota_sensor_am2301_state]
 debug: false
-do_write_to_influx: true
+do_write_to_influx: false
+verbose: 0
+
+[tasmota_sensor_ds18b20]
+debug: false
+do_write_to_influx: false
 verbose: 1
