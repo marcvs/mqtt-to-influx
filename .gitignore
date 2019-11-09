@@ -3,3 +3,6 @@ __pycache__
 .tox/*
 .eggs/*
 *.egg-info
+build
+dist
+mqtt.log
