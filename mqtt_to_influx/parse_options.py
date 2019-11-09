@@ -2,24 +2,31 @@
 # vim: tw=100 foldmethod=indent
 # pylint: disable=bad-continuation, invalid-name, superfluous-parens
 # pylint: disable=bad-whitespace, mixed-indentation
-# pylint: disable=redefined-outer-name, logging-not-lazy, logging-format-interpolation
+# pylint: disable=redefined-outer-name
 # pylint: disable=missing-docstring, trailing-whitespace, trailing-newlines, too-few-public-methods
 # }}}
 
 import os
 import sys
+import logging
 import configargparse
 
-        
+logger = logging.getLogger(__name__)
+
 def parseOptions():
     '''Parse the commandline options'''
 
-    path_of_executable = os.path.realpath(sys.argv[0])
-    folder_of_executable = os.path.split(path_of_executable)[0]
+    logger.info("reading config")
+    path_of_executable      = os.path.realpath(sys.argv[0])
+    folder_of_executable    = os.path.split(path_of_executable)[0]
     full_name_of_executable = os.path.split(path_of_executable)[1]
-    name_of_executable = full_name_of_executable.rstrip('.py')
-
-    config_files = [os.environ['HOME']+'/.config/%s.conf' % name_of_executable,
+    name_of_executable      = full_name_of_executable.rstrip('.py')
+    config_in_home          = ''
+    try:
+        config_in_home      = os.environ['HOME']+'/.config/%s.conf' % name_of_executable
+    except KeyError:
+        pass
+    config_files = [config_in_home,
                     folder_of_executable +'/%s.conf'     % name_of_executable,
                     '/etc/mqtt-to-influx/mqtt-to-influx.conf']
 

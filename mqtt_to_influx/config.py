@@ -1,7 +1,17 @@
+# pylint # {{{
+# vim: tw=100 foldmethod=indent
+# pylint: disable=bad-continuation, invalid-name, superfluous-parens
+# pylint: disable=bad-whitespace, mixed-indentation
+# pylint: disable=redefined-outer-name
+# pylint: disable=missing-docstring, trailing-whitespace, trailing-newlines, too-few-public-methods
+# }}}
 import os
+import logging
 from configparser import ConfigParser
 from configparser import ExtendedInterpolation
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # CONFIG = ConfigParser()
 CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
@@ -18,6 +28,8 @@ def reload():
     ~/.config/mqtt-to-influx/mqtt-to-influx.pathconf
     """
     files = []
+
+    logger.info("reading pathconfig")
 
     filename = os.environ.get("MQTT_TO_INFLUX_CONFIG")
     if filename:

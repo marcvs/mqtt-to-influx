@@ -2,7 +2,7 @@
 # vim: tw=100 foldmethod=indent
 # pylint: disable=bad-continuation, invalid-name, superfluous-parens
 # pylint: disable=bad-whitespace, mixed-indentation
-# pylint: disable=redefined-outer-name, logging-not-lazy, logging-format-interpolation
+# pylint: disable=redefined-outer-name
 # pylint: disable=missing-docstring, trailing-whitespace, trailing-newlines, too-few-public-methods
 # }}}
 

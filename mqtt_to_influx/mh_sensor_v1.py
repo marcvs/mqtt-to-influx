@@ -2,19 +2,23 @@
 # vim: tw=100 foldmethod=indent
 # pylint: disable=bad-continuation, invalid-name, superfluous-parens
 # pylint: disable=bad-whitespace, mixed-indentation
-# pylint: disable=redefined-outer-name, logging-not-lazy, logging-format-interpolation
+# pylint: disable=redefined-outer-name
 # pylint: disable=missing-docstring, trailing-whitespace, trailing-newlines, too-few-public-methods
 # pylint: disable=unused-argument
 # }}}
 import json
+import logging
 from mqtt_to_influx.config import CONFIG
 from mqtt_to_influx.influx_client import influx_client
+
+logger = logging.getLogger(__name__)
 
 class Process_mqtt_message:
     def __init__(self, mqtt_client, userdata, msg):
         configname = __name__.split('.')[1]
+        logger.debug(configname)
         if int(CONFIG[configname].get('verbose', 0)) > 0:
-            print("processing: {: <30}{}".format(msg.topic, msg.payload.decode()))
+            logger.info("processing: {: <30}{}".format(msg.topic, msg.payload.decode()))
         device_name   = msg.topic.split("/status/")[0].lstrip("/").replace("/",".")
         friendly_name = msg.topic.split("/status/")[1]
 
@@ -23,7 +27,7 @@ class Process_mqtt_message:
 
         payload_dec  = msg.payload.decode()
         if int(CONFIG[configname].get('verbose', 0)) > 0:
-            print (F"value: {payload_dec}")
+            logger.info (F"value: {payload_dec}")
 
         json_body = [
             {
@@ -40,5 +44,5 @@ class Process_mqtt_message:
             influx_client.write_points(json_body)
         else: 
             if int(CONFIG[configname].get('verbose', 0)) > 1:
-                print(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
+                logger.info(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
         return None

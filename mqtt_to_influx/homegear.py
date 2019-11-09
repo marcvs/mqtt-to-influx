@@ -2,19 +2,23 @@
 # vim: tw=100 foldmethod=indent
 # pylint: disable=bad-continuation, invalid-name, superfluous-parens
 # pylint: disable=bad-whitespace, mixed-indentation
-# pylint: disable=redefined-outer-name, logging-not-lazy, logging-format-interpolation
+# pylint: disable=redefined-outer-name
 # pylint: disable=missing-docstring, trailing-whitespace, trailing-newlines, too-few-public-methods
 # pylint: disable=unused-argument
 # }}}
 import json
+import logging
 from mqtt_to_influx.config import CONFIG
 from mqtt_to_influx.influx_client import influx_client
+
+logger = logging.getLogger(__name__)
 
 class Process_mqtt_message:
     def __init__(self, mqtt_client, userdata, msg):
         configname = __name__.split('.')[1]
+        logger.debug(configname)
         if int(CONFIG[configname].get('verbose', 0)) > 0:
-            print("processing: {: <30}{}".format(msg.topic, msg.payload.decode()))
+            logger.info("processing: {: <30}{}".format(msg.topic, msg.payload.decode()))
 
           # 1 "Entkleide"
           # 2 "Wohnzimmer"
@@ -32,10 +36,10 @@ class Process_mqtt_message:
         except json.decoder.JSONDecodeError:
             return None
         if int(CONFIG[configname].get('verbose', 0)) > 0:
-            print ("payload_json: ")
-            print(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
+            logger.info ("payload_json: ")
+            logger.info(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
 
-        # print(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
+        # logger.info(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
         try:
             for (k,v) in payload_json.items():
                 payload_json[k]=float(v)
@@ -49,14 +53,14 @@ class Process_mqtt_message:
                     "fields": payload_json 
                 }
             ]
-            # print(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
-            # print(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
+            # logger.info(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
+            # logger.info(json.dumps(payload_json, sort_keys=True, indent=4, separators=(',', ': ')))
             if CONFIG[configname].getboolean('do_write_to_influx'):
                 influx_client.write_points(json_body)
             else: 
                 if int(CONFIG[configname].get('verbose', 0)) > 1:
-                    print(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
+                    logger.info(json.dumps(json_body, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception as e:
-            print (str(e))
+            logger.exception (str(e))
 
         return None
