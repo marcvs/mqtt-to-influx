@@ -1,0 +1,18 @@
+[Unit]
+Description=MQTT To Influx
+Requires=
+After=network.target
+
+[Service]
+Type=simple
+;EnvironmentFile=%h/configs/environment
+ExecStart=%h/projects/mqtt-to-influx/mqtt-to-influx.py
+;--config=%h/configs/%i.json --debug
+Restart=on-failure
+RestartSec=1m
+user=marcus
+
+[Install]
+WantedBy=default.target
+
+
