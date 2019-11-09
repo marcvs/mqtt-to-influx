@@ -2,6 +2,18 @@
 
 SERVICE="mqtt-to-influx"
 LIB_SYSD="/lib/systemd/system"
+INSTALL=pip
+
+PIP=`which pip3`
+test -z $PIP && {
+    PIP=`which pip3`
+    test -z $PIP && {
+        echo "pip not found.\n    apt-get install python3-pip"
+        exit 1
+    }
+}
+
+
 
 test -d dist && {
     echo "You should remove the dist dir first"
