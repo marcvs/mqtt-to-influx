@@ -36,6 +36,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
     # mqtt_client.subscribe("/#")
 
 def on_message(mqtt_client, userdata, msg):
+    '''Default Handler for Processing message that aren't caught otherwhere'''
     print (F"Unrestiered topic: {msg.topic}")
 
 if 'mqtt_topics' not in CONFIG:
@@ -43,19 +44,21 @@ if 'mqtt_topics' not in CONFIG:
     exit (1)
 
 
+def main():
+    print ("Starting Daemon")
 
-
-mqtt_client = mqtt.Client()
-mqtt_client.reconnect_delay_set(min_delay=1, max_delay=120)
-mqtt_client.on_connect = on_connect
-mqtt_client.on_message = on_message
-
-mqtt_client.connect(args.mqtt_host, args.mqtt_port, keepalive=60)
-
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-mqtt_client.loop_forever()
-if (__name__ == "main"):
-    print "MAIN"
+    mqtt_client = mqtt.Client()
+    mqtt_client.reconnect_delay_set(min_delay=1, max_delay=120)
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+    #
+    mqtt_client.connect(args.mqtt_host, args.mqtt_port, keepalive=60)
+    #
+    # Blocking call that processes network traffic, dispatches callbacks and
+    # handles reconnecting.
+    # Other loop*() functions are available that give a threaded interface and a
+    # manual interface.
+    try:
+        mqtt_client.loop_forever()
+    except KeyboardInterrupt:
+        print ("\b\b\nExit: user pressed control-c\n")
