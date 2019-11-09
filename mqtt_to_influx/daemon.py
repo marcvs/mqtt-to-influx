@@ -20,11 +20,11 @@ from mqtt_to_influx.parse_options import args
 
 logging.basicConfig(
     level=os.environ.get("LOG", "INFO"),
-    # format='[%(levelname)s] [%(filename)s:%(funcName)s:%(lineno)d] %(message)s'
-    format='[%(levelname)s] %(message)s'
+    format='[%(levelname)s] [%(filename)s:%(funcName)s:%(lineno)d] %(message)s'
+    # format='[%(levelname)s] %(message)s'
 )
 logger = logging.getLogger(__name__)
-        
+
 
 # The callback for when the mqtt_client receives a CONNACK response from the server.
 def on_connect(mqtt_client, userdata, flags, rc):
@@ -42,19 +42,21 @@ def on_connect(mqtt_client, userdata, flags, rc):
                 is_verb = "verbose"
 
             is_active = "not active"
-            if int(CONFIG[CONFIG['mqtt_topics'][path]]['do_write_to_influx']) == 1:
+            xxxxxxx = CONFIG[CONFIG['mqtt_topics'][path]].get( 'do_write_to_influx' , False)
+            logger.info(F"xxx: {xxxxxxx}")
+            if xxxxxxx :
                 is_active = "activated"
-            logger.info("Connected {:.<31} {:.<30} {:.<8} --- {}".format(path+' ', CONFIG['mqtt_topics'][path]+' ',\
+            logger.info("Connected {:.<31} {:.<30} {:.<8} {}".format(path+' ', CONFIG['mqtt_topics'][path]+' ',\
                     is_verbose, is_active))
         except Exception as e:
-            logger.exception(f"  Error connecting: {e!r}")
+            logger.exception("  Error connecting to mqtt")
             exit (2)
     # Subscribe all
     # mqtt_client.subscribe("/#")
 
 def on_message(mqtt_client, userdata, msg):
     '''Default Handler for Processing message that aren't caught otherwhere'''
-    logger.debug(F"Unregistered topic: {msg.topic}")
+    logger.debug("Unregistered topic: {}".format(msg.topic))
 
 if 'mqtt_topics' not in CONFIG:
     logger.error("Error no secion for 'mqtt_topics' found in pathconfig")
