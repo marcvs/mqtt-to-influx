@@ -20,7 +20,9 @@ def parseOptions():
     name_of_executable = full_name_of_executable.rstrip('.py')
 
     config_files = [os.environ['HOME']+'/.config/%s.conf' % name_of_executable,
-                    folder_of_executable +'/%s.conf'     % name_of_executable]
+                    folder_of_executable +'/%s.conf'     % name_of_executable,
+                    '/etc/mqtt-to-influx/mqtt-to-influx.conf']
+
     parser = configargparse.ArgumentParser(
             default_config_files = config_files,
             description=name_of_executable, ignore_unknown_config_file_keys=True)
