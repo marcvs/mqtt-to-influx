@@ -1,0 +1,36 @@
+CHANGES
+=======
+
+v0.2
+----
+
+* pip=>${PIP}
+* add checks to find pip3 or pip
+
+v0.1
+----
+
+* add active deactive information per plugin
+* play with logging
+* add active state information
+* change to logger
+* remove x
+* change default config file location
+* add main functin
+* make sure noone writes to influx
+* change name
+* change config file locations
+* systemd..
+* install script (for root)
+* copy of main script, for use with entry point
+* add install notes
+* add mit license
+* Add exception in case something goes wrong
+* add ds18b20
+* ignore
+* redesign one
+* removed newline
+* move functionality into modules
+* Add support for homematic/homegear json
+* add homegear
+* new
