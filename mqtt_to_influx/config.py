@@ -10,8 +10,10 @@ CONFIG.optionxform = lambda option: option
 def reload():
     """Reload configuration from disk.
 
-    Config locations, by priority:
+    Config locations, by priority (all values are merged. The last one
+        overwrites earlier ones)
     $MQTT_TO_INFLUX_CONFIG
+    /etc/mqtt-to-influx/mqtt-to-influx.pathconf
     ./mqtt-to-influx.pathconf
     ~/.config/mqtt-to-influx/mqtt-to-influx.pathconf
     """
@@ -22,9 +24,9 @@ def reload():
         files += [Path(filename)]
 
     files += [
-        Path('./mqtt-to-influx.pathconf'),
+        Path('/')/'etc'/'mqtt-to-influx'/'mqtt-to-influx.pathconf',
         Path.home()/'.config'/'mqtt-to-influx'/'mqtt-to-influx.pathconf',
-        Path('/')/'etc'/'mqtt-to-influx.pathconf'
+        Path('./mqtt-to-influx.pathconf')
     ]
 
     CONFIG.read(files)
