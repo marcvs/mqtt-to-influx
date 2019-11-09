@@ -10,7 +10,7 @@ ExecStart=mqtt-to-influx
 ;--config=%h/configs/%i.json --debug
 Restart=on-failure
 RestartSec=1m
-User=marcus
+User=mqttinflux
 
 [Install]
 WantedBy=default.target
