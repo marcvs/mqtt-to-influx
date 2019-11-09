@@ -14,5 +14,3 @@ User=marcus
 
 [Install]
 WantedBy=default.target
-
-
