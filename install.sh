@@ -60,8 +60,10 @@ echo -e "\nDone building ${FULLNAME}\n"
         cp systemd/mqtt-to-influx.service ${LIB_SYSD}
         systemctl daemon-reload
     }
+    echo "Restarting service"
     systemctl enable $SERVICE
     systemctl restart $SERVICE
+    echo "Done"
 }
 
 # else we print the necessary steps
