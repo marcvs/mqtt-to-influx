@@ -23,7 +23,9 @@ echo "pip: ${PIP}"
 #     exit 1
 # }
 
-python3 setup.py sdist 
+echo "Building sdist"
+python3 setup.py sdist  > build.log 2>&1
+
 FULLNAME=`python3 setup.py --fullname`
 
 echo -e "\nDone building ${FULLNAME}\n"
