@@ -18,11 +18,11 @@ from mqtt_to_influx.config import CONFIG
 from mqtt_to_influx.parse_options import args
 
 
-logging.basicConfig(
-    level=os.environ.get("LOG", "INFO"),
-    format='[%(levelname)s] [%(filename)s:%(funcName)s:%(lineno)d] %(message)s'
-    # format='[%(levelname)s] %(message)s'
-)
+logformat='[%(levelname)s] %(message)s'
+if args.verbose:
+    logformat='[%(levelname)s] [%(filename)s:%(funcName)s:%(lineno)d] %(message)s'
+logging.basicConfig(level=os.environ.get("LOG", "INFO"), format = logformat)
+
 logger = logging.getLogger(__name__)
 
 
