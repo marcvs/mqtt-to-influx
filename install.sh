@@ -4,12 +4,13 @@ SERVICE="mqtt-to-influx"
 LIB_SYSD="/lib/systemd/system"
 INSTALL=pip
 USER=mqttinflux
+ETC_CONFIG=/etc/mqtt-to-influx
 
 PIP=`which pip3`
 test -z $PIP && {
     PIP=`which pip`
     test -z $PIP && {
-        echo "pip not found.\n    apt-get install python3-pip"
+        echo -e "pip not found.\n    =>  apt-get install python3-pip"
         exit 1
     }
 }
@@ -29,6 +30,7 @@ echo -e "\nDone building ${FULLNAME}\n"
 
 # IF we're root, we go and install
 [ ${UID} == 0 ] && {
+    echo "Installing ${SERVICE} via ${PIP}"
     ${PIP} install dist/${FULLNAME}*tar.gz
     useradd -m ${USER}
     RV=$?
@@ -37,12 +39,22 @@ echo -e "\nDone building ${FULLNAME}\n"
         10-14) echo "Error creating user"; exit 1;;
     esac
 
+
+    test -d ${ETC_CONFIG} || {
+        echo "Creating /etc/mqtt-to-influx and copying defaults there"
+        mkdir -p ${ETC_CONFIG}
+        cp mqtt-to-influx.*conf ${ETC_CONFIG}
+        chown -R ${USER} ${ETC_CONFIG}
+    }
+
     test -e ${LIB_SYSD}/${SERVICE}.service && {
         diff -q systemd/mqtt-to-influx.service ${LIB_SYSD} >/dev/null || {
+            echo "Preparing systemd service for update"
             rm -f ${LIB_SYSD}/${SERVICE}.service
         }
     }
     test -e ${LIB_SYSD}/${SERVICE}.service || {
+        echo "Installing systemd service"
         cp systemd/mqtt-to-influx.service ${LIB_SYSD}
         systemctl daemon-reload
     }
