@@ -2,7 +2,7 @@
 
 SERVICE="mqtt-to-influx"
 LIB_SYSD="/lib/systemd/system"
-INSTALL=pip
+SYSD_SERVICE=systemd/mqtt-to-influx.service
 USER=mqttinflux
 ETC_CONFIG=/etc/mqtt-to-influx
 
@@ -43,21 +43,21 @@ echo -e "\nDone building ${FULLNAME}\n"
 
 
     test -d ${ETC_CONFIG} || {
-        echo "Creating /etc/mqtt-to-influx and copying defaults there"
+        echo "Creating ${ETC_CONFIG} and copying defaults there"
         mkdir -p ${ETC_CONFIG}
         cp mqtt-to-influx.*conf ${ETC_CONFIG}
         chown -R ${USER} ${ETC_CONFIG}
     }
 
     test -e ${LIB_SYSD}/${SERVICE}.service && {
-        diff -q systemd/mqtt-to-influx.service ${LIB_SYSD} >/dev/null || {
+        diff -q ${SYSD_SERVICE} ${LIB_SYSD} >/dev/null || {
             echo "Preparing systemd service for update"
             rm -f ${LIB_SYSD}/${SERVICE}.service
         }
     }
     test -e ${LIB_SYSD}/${SERVICE}.service || {
         echo "Installing systemd service"
-        cp systemd/mqtt-to-influx.service ${LIB_SYSD}
+        cp ${SYSD_SERVICE} ${LIB_SYSD}/${SERVICE}.service
         systemctl daemon-reload
     }
     echo "Restarting service"
@@ -74,9 +74,9 @@ echo -e "\nDone building ${FULLNAME}\n"
 
     echo "    useradd -m ${USER}"
     test -e ${LIB_SYSD}/${SERVICE}.service && {
-        diff -q systemd/mqtt-to-influx.service ${LIB_SYSD} >/dev/null || {
+        diff -q ${SYSD_SERVICE} ${LIB_SYSD} >/dev/null || {
             echo "    rm -f ${LIB_SYSD}/${SERVICE}.service"
-            echo "    cp systemd/mqtt-to-influx.service ${LIB_SYSD}"
+            echo "    cp ${SYSD_SERVICE} ${LIB_SYSD}/${SERVICE}.service"
         }
     }
     echo "    systemctl enable $SERVICE"
